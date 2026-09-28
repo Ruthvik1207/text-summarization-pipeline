@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SummarAI Monitoring Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #f1f5f9; padding: 2rem; }
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        h1 { color: #06b6d4; font-size: 24px; }
+        h2 { color: #a855f7; font-size: 18px; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
+        th { color: #94a3b8; font-weight: 600; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        .pass { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .drift { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    </style>
+</head>
+<body>
+    <h1>SummarAI Continuous Monitoring Report</h1>
+    <p>Generated at: 2026-09-28T09:53:57.247149+00:00 UTC</p>
+    <div class="card">
+        <h2>Overall Status</h2>
+        <p>Dataset Drift Detected: <span class="badge drift">DRIFT DETECTED</span></p>
+        <p>Overall Drift Score: <strong>0.75</strong></p>
+        <p>Total Production Requests Analyzed: <strong>4</strong></p>
+    </div>
+    <div class="card">
+        <h2>Feature-Level Distribution Tests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Reference Mean</th>
+                    <th>Current Mean</th>
+                    <th>KS Statistic</th>
+                    <th>P-Value</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>input_length</td><td>1001.33</td><td>62.25</td><td>1.0</td><td>0.0005</td><td><span class='badge drift'>DRIFT</span></td></tr><tr><td>output_length</td><td>105.80</td><td>30.00</td><td>1.0</td><td>0.0005</td><td><span class='badge drift'>DRIFT</span></td></tr><tr><td>compression_ratio</td><td>0.11</td><td>0.55</td><td>1.0</td><td>0.0005</td><td><span class='badge drift'>DRIFT</span></td></tr><tr><td>latency_ms</td><td>1398.67</td><td>2329.25</td><td>0.3</td><td>0.8452</td><td><span class='badge pass'>STABLE</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

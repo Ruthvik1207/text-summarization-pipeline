@@ -1,0 +1,41 @@
+stages:
+  prepare:
+    cmd: python scripts/prepare_data.py
+    deps:
+      - data/raw/dataset.csv
+      - scripts/prepare_data.py
+    params:
+      - prepare.raw_data_path
+      - prepare.processed_train_path
+      - prepare.processed_val_path
+      - prepare.split_ratio
+    outs:
+      - data/processed/train.csv:
+          persist: true
+      - data/processed/val.csv:
+          persist: true
+
+  train_and_evaluate:
+    cmd: python scripts/run_training.py
+    deps:
+      - data/processed/train.csv
+      - data/processed/val.csv
+      - scripts/run_training.py
+    params:
+      - training.model_name
+      - training.epochs
+      - training.batch_size
+      - training.learning_rate
+      - training.min_rouge_threshold
+    metrics:
+      - reports/train_metrics.json:
+          cache: false
+
+  monitor:
+    cmd: python scripts/generate_monitoring_report.py
+    deps:
+      - data/reference/reference_baseline.csv
+      - scripts/generate_monitoring_report.py
+    params:
+      - monitoring.reference_data_path
+      - monitoring.reports_dir

@@ -1,0 +1,71 @@
+# Environment variables
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Node & Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+frontend/dist/
+frontend/.cache/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+backend/data/*.db
+
+# MLflow
+mlruns/
+mlflow.db
+.mlflow/
+
+# DVC
+.dvc/cache/
+.dvc/tmp/
+backend/.dvc/cache/
+
+# Large Model Checkpoints & Raw Downloads
+# Keep code and sample data, ignore heavy downloaded weights
+backend/models/*/
+!backend/models/.gitkeep
+backend/artifacts/candidate_*/
+
+# IDE & Operating System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

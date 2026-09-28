@@ -1,0 +1,22 @@
+prepare:
+  raw_data_path: "data/raw/dataset.csv"
+  processed_train_path: "data/processed/train.csv"
+  processed_val_path: "data/processed/val.csv"
+  split_ratio: 0.8
+  random_seed: 42
+
+training:
+  model_name: "google/flan-t5-small"
+  model_version: "1.0.0"
+  epochs: 2
+  batch_size: 4
+  learning_rate: 0.00005
+  max_input_length: 512
+  max_output_length: 150
+  min_rouge_threshold: 0.35
+  dataset_version: "v1.0"
+
+monitoring:
+  reference_data_path: "data/reference/reference_baseline.csv"
+  reports_dir: "reports"
+  drift_threshold: 0.5
