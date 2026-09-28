@@ -63,6 +63,8 @@ backend/.dvc/cache/
 backend/models/*/
 !backend/models/.gitkeep
 backend/artifacts/candidate_*/
+backend/reports/*.html
+backend/reports/*.json
 
 # IDE & Operating System
 .vscode/

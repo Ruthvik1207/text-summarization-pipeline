@@ -1,9 +1,9 @@
 # Text Summarization Pipeline
 
-> **SummarAI — Intelligent Text Summarization & Continuous MLOps Platform**  
+> **Text Summarization Pipeline — Intelligent NLP & Continuous MLOps Platform**  
 > *Production-grade NLP summarization powered by Google FLAN-T5, FastAPI, MLflow experiment tracking, DVC dataset versioning, Evidently AI drift monitoring, Docker Compose, and a Liquid Glass React dashboard.*
 
-[![CI/CD Pipeline](https://github.com/your-username/text-summarization-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/text-summarization-pipeline/actions)
+[![CI/CD Pipeline](https://github.com/Ruthvik1207/text-summarization-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Ruthvik1207/text-summarization-pipeline/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
 [![React 19](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://react.dev/)
@@ -361,7 +361,7 @@ git init
 git add .
 git commit -m "Initial commit: Complete Text Summarization Pipeline with Liquid Glass UI"
 git branch -M main
-git remote add origin <YOUR_GITHUB_REPOSITORY_URL>
+git remote add origin https://github.com/Ruthvik1207/text-summarization-pipeline.git
 git push -u origin main
 ```
 
