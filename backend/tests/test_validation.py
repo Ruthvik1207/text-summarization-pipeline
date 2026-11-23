@@ -7,10 +7,10 @@ def test_summarize_whitespace_only(client):
     response = client.post("/api/v1/summarize", json={"text": "      \n\t   "})
     assert response.status_code == 400
 
-def test_summarize_too_short_text(client):
-    response = client.post("/api/v1/summarize", json={"text": "Short hello"})
+def test_summarize_too_long_text(client):
+    response = client.post("/api/v1/summarize", json={"text": "a" * 200005})
     assert response.status_code == 400
-    assert "too short" in response.json()["detail"].lower()
+    assert "exceeds" in response.json()["detail"].lower()
 
 def test_summarize_min_greater_than_max(client):
     response = client.post(

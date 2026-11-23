@@ -1,6 +1,14 @@
 import os
+import sys
 import threading
+from pathlib import Path
 from typing import Optional, Tuple
+
+# Ensure backend root is on sys.path when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, PreTrainedModel, PreTrainedTokenizer
 from app.config import settings
@@ -46,6 +54,9 @@ class ModelManager:
                 logger.info(f"Loading weights from: {source}")
                 self.tokenizer = AutoTokenizer.from_pretrained(source)
                 self.model = AutoModelForSeq2SeqLM.from_pretrained(source)
+                
+                if self.model is None or self.tokenizer is None:
+                    raise RuntimeError(f"Failed to load tokenizer or model from {source}")
                 
                 self.model.to(self.device)
                 self.model.eval()

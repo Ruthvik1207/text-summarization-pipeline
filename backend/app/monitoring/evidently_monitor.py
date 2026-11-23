@@ -58,6 +58,7 @@ class EvidentlyMonitor:
         json_report_path = self.reports_dir / report_filename.replace('.html', '.json')
 
         drift_detected = False
+        drift_score = 0.0
         p_values = {}
         drift_scores = {}
 

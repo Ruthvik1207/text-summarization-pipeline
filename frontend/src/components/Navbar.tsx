@@ -12,6 +12,7 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
+import { MLflowStatusResponse } from '../types';
 
 export type TabType =
   | 'dashboard'
@@ -27,12 +28,14 @@ interface NavbarProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
   isBackendHealthy: boolean;
+  mlflow?: MLflowStatusResponse | null;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   isBackendHealthy,
+  mlflow,
 }) => {
   const navItems: { id: TabType; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <Cpu className="w-4 h-4" /> },
@@ -99,13 +102,38 @@ export const Navbar: React.FC<NavbarProps> = ({
             pulse={isBackendHealthy}
           />
           <a
-            href="http://localhost:5000"
+            href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-colors"
+            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+              mlflow?.is_connected
+                ? 'text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30'
+                : 'text-slate-400 bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 opacity-70'
+            }`}
+            title={mlflow?.is_connected ? 'Open MLflow Traces & LLM Observability' : 'MLflow Tracking Server is offline'}
           >
-            <span className="w-2 h-2 rounded-full bg-cyan-400" />
-            <span>MLflow</span>
+            <span className={`w-2 h-2 rounded-full ${mlflow?.is_connected ? 'bg-purple-400 animate-pulse' : 'bg-slate-500'}`} />
+            <span>Traces</span>
+            {mlflow?.traces_count !== undefined && mlflow.traces_count > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-purple-500/20 text-[10px] text-purple-200 font-mono">
+                {mlflow.traces_count}
+              </span>
+            )}
+            <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
+          </a>
+          <a
+            href={mlflow?.tracking_uri || 'http://localhost:5000'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+              mlflow?.is_connected
+                ? 'text-slate-300 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10'
+                : 'text-amber-300 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/30'
+            }`}
+            title={mlflow?.is_connected ? 'Open MLflow Tracking UI' : 'MLflow Server is offline or starting'}
+          >
+            <span className={`w-2 h-2 rounded-full ${mlflow?.is_connected ? 'bg-cyan-400' : 'bg-amber-400'}`} />
+            <span>{mlflow?.is_connected ? 'MLflow' : 'MLflow Offline'}</span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </a>
           <a

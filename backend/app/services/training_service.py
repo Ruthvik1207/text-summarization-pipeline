@@ -125,43 +125,47 @@ class TrainingService:
 
             # Mark completed
             db = SessionLocal()
-            job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
-            if job:
-                job.status = "completed"
-                job.progress = 100
-                job.current_step = "Completed"
-                job.rouge1 = result.get("rouge1")
-                job.rouge2 = result.get("rouge2")
-                job.rougeL = result.get("rougeL")
-                job.validation_loss = result.get("train_loss")
-                job.registered = result.get("accepted", False)
-                job.completed_at = datetime.now(timezone.utc)
-                db.commit()
-            logger.info(f"Training job {job_id} successfully completed.")
+            try:
+                job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+                if job:
+                    job.status = "completed"
+                    job.progress = 100
+                    job.current_step = "Completed"
+                    job.rouge1 = result.get("rouge1")
+                    job.rouge2 = result.get("rouge2")
+                    job.rougeL = result.get("rougeL")
+                    job.validation_loss = result.get("train_loss")
+                    job.registered = result.get("accepted", False)
+                    job.completed_at = datetime.now(timezone.utc)
+                    db.commit()
+                logger.info(f"Training job {job_id} successfully completed.")
+            finally:
+                db.close()
         except Exception as e:
             logger.error(f"Training job {job_id} failed: {e}", exc_info=True)
             db = SessionLocal()
-            job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
-            if job:
-                job.status = "failed"
-                job.error_message = str(e)
-                job.current_step = f"Failed: {str(e)[:100]}"
-                db.commit()
-        finally:
-            db.close()
+            try:
+                job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+                if job:
+                    job.status = "failed"
+                    job.error_message = str(e)
+                    job.current_step = f"Failed: {str(e)[:100]}"
+                    db.commit()
+            finally:
+                db.close()
 
     def get_latest_status(self, job_id: Optional[str] = None, db: Optional[Session] = None) -> Optional[Dict[str, Any]]:
         """Retrieves status of specific job or latest active job."""
         close_db = False
+        active_db: Session = db if db is not None else SessionLocal()
         if db is None:
-            db = SessionLocal()
             close_db = True
 
         try:
             if job_id:
-                job = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
+                job = active_db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
             else:
-                job = db.query(TrainingJob).order_by(TrainingJob.created_at.desc()).first()
+                job = active_db.query(TrainingJob).order_by(TrainingJob.created_at.desc()).first()
 
             if not job:
                 return None
@@ -185,6 +189,6 @@ class TrainingService:
             }
         finally:
             if close_db:
-                db.close()
+                active_db.close()
 
 training_service = TrainingService()

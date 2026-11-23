@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import List
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Base directories
@@ -21,7 +22,8 @@ class Settings(BaseSettings):
     MAX_INPUT_LENGTH: int = 2048
     MAX_CHUNK_TOKENS: int = 480
     DEFAULT_MAX_OUTPUT_LENGTH: int = 150
-    DEFAULT_MIN_OUTPUT_LENGTH: int = 40
+    DEFAULT_MIN_OUTPUT_LENGTH: int = 15
+    DEFAULT_NUM_BEAMS: int = 1
     
     # Directories inside backend/
     BACKEND_DIR: Path = BACKEND_DIR
@@ -51,11 +53,23 @@ class Settings(BaseSettings):
     ]
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", str(BACKEND_DIR.parent / ".env"), str(BACKEND_DIR / ".env")),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"
     )
+
+    @model_validator(mode="after")
+    def resolve_paths(self):
+        if self.DATABASE_URL.startswith("sqlite:///"):
+            raw_path = self.DATABASE_URL[len("sqlite:///"):]
+            if raw_path and raw_path != ":memory:":
+                p = Path(raw_path)
+                if not p.is_absolute():
+                    p = (self.BACKEND_DIR / p).resolve()
+                    self.DATABASE_URL = f"sqlite:///{p.as_posix()}"
+                p.parent.mkdir(parents=True, exist_ok=True)
+        return self
 
 settings = Settings()
 

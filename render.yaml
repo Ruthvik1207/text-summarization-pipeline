@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: text-summarization-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEVICE
+        value: cpu
+      - key: MODEL_NAME
+        value: google/flan-t5-small
+      - key: MLFLOW_TRACKING_URI
+        value: http://127.0.0.1:5000
+      - key: CORS_ORIGINS
+        value: '["*"]'

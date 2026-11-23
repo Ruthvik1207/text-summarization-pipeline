@@ -11,6 +11,7 @@ class MLflowService:
         self.tracking_uri = settings.MLFLOW_TRACKING_URI
         self.experiment_name = settings.MLFLOW_EXPERIMENT_NAME
         self.registered_model_name = settings.MLFLOW_REGISTERED_MODEL_NAME
+        self._server_process = None
         self._setup_client()
 
     def _setup_client(self):
@@ -27,10 +28,19 @@ class MLflowService:
             from urllib.parse import urlparse
             import socket
             parsed = urlparse(self.tracking_uri)
-            host = parsed.hostname or "localhost"
+            host = parsed.hostname or "127.0.0.1"
             port = parsed.port or (443 if parsed.scheme == "https" else 80)
-            with socket.create_connection((host, port), timeout=0.5):
-                pass
+            # Try connecting directly to host
+            try:
+                with socket.create_connection((host, port), timeout=0.8):
+                    pass
+            except Exception:
+                # If host was localhost, fallback to IPv4 loopback
+                if host == "localhost":
+                    with socket.create_connection(("127.0.0.1", port), timeout=0.8):
+                        pass
+                else:
+                    return False
         except Exception:
             return False
 
@@ -44,6 +54,59 @@ class MLflowService:
             return False
         return False
 
+    def start_local_server(self) -> bool:
+        """Starts local MLflow tracking server as a background subprocess if tracking URI is localhost."""
+        if self.is_connected():
+            return True
+        try:
+            from urllib.parse import urlparse
+            import subprocess
+            import sys
+            import time
+            parsed = urlparse(self.tracking_uri)
+            host = parsed.hostname or "localhost"
+            if host in ("localhost", "127.0.0.1"):
+                port = parsed.port or 5000
+                db_path = settings.BACKEND_DIR / "mlflow.db"
+                artifacts_path = settings.BACKEND_DIR / "mlflow-artifacts"
+                artifacts_path.mkdir(parents=True, exist_ok=True)
+                cmd = [
+                    sys.executable, "-m", "mlflow", "server",
+                    "--backend-store-uri", f"sqlite:///{db_path}",
+                    "--default-artifact-root", str(artifacts_path),
+                    "--host", "127.0.0.1",
+                    "--port", str(port)
+                ]
+                logger.info(f"Auto-starting local MLflow tracking server on 127.0.0.1:{port}...")
+                self._server_process = subprocess.Popen(
+                    cmd,
+                    cwd=str(settings.BACKEND_DIR),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                for _ in range(15):
+                    time.sleep(0.5)
+                    if self.is_connected():
+                        logger.info("Local MLflow server started and verified.")
+                        return True
+        except Exception as e:
+            logger.warning(f"Could not auto-start local MLflow server: {e}")
+        return False
+
+    def stop_local_server(self):
+        """Stops the spawned local MLflow server if it was started by this process."""
+        if self._server_process:
+            try:
+                logger.info("Stopping auto-started MLflow server...")
+                self._server_process.terminate()
+                self._server_process.wait(timeout=3)
+            except Exception:
+                try:
+                    self._server_process.kill()
+                except Exception:
+                    pass
+            self._server_process = None
+
     def get_status(self) -> Dict[str, Any]:
         """Returns the current MLflow server and experiment status."""
         connected = self.is_connected()
@@ -55,7 +118,10 @@ class MLflowService:
             "latest_run_id": None,
             "latest_metrics": {},
             "registered_model_version": None,
-            "runs_count": 0
+            "runs_count": 0,
+            "traces_count": 0,
+            "latest_trace_id": None,
+            "traces_url": f"{self.tracking_uri}/#/experiments/1/traces"
         }
 
         if not connected or not self.client:
@@ -64,6 +130,7 @@ class MLflowService:
         try:
             exp = self.client.get_experiment_by_name(self.experiment_name)
             if exp:
+                status_info["traces_url"] = f"{self.tracking_uri}/#/experiments/{exp.experiment_id}/traces"
                 runs = self.client.search_runs(
                     experiment_ids=[exp.experiment_id],
                     max_results=10,
@@ -76,6 +143,15 @@ class MLflowService:
                     status_info["latest_metrics"] = {
                         k: round(v, 4) for k, v in latest.data.metrics.items()
                     }
+
+                # Query MLflow Traces
+                try:
+                    traces = self.client.search_traces([exp.experiment_id], max_results=20)
+                    status_info["traces_count"] = len(traces)
+                    if traces:
+                        status_info["latest_trace_id"] = traces[0].info.request_id
+                except Exception as trace_err:
+                    logger.debug(f"Could not query MLflow traces: {trace_err}")
 
             # Check registered models
             try:

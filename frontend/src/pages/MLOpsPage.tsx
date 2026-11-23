@@ -37,11 +37,25 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
   };
 
   useEffect(() => {
-    fetchStatus();
+    let isMounted = true;
+    const pollStatus = async () => {
+      try {
+        const res = await api.getTrainingStatus();
+        if (isMounted) setTrainingStatus(res);
+      } catch {
+        // no training job started yet
+      }
+    };
+
+    void pollStatus();
     const interval = setInterval(() => {
-      fetchStatus();
+      void pollStatus();
     }, 3000);
-    return () => clearInterval(interval);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleStartTraining = async () => {
@@ -165,12 +179,25 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
                 variant={mlflow?.is_connected ? 'healthy' : 'warning'}
               />
               <a
+                href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-purple-300 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 transition-colors"
+                title="Inspect real-time generation traces in MLflow"
+              >
+                <span>Traces</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-purple-500/30 text-[10px] text-purple-200 font-mono">
+                  {mlflow?.traces_count ?? 0}
+                </span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <a
                 href={mlflow?.tracking_uri || 'http://localhost:5000'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-colors"
               >
-                <span>Open MLflow</span>
+                <span>MLflow UI</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -193,8 +220,20 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
               <div className="flex items-center justify-between text-xs mt-1">
                 <span className="text-slate-400">Registered Model</span>
                 <span className="text-emerald-400 font-mono text-[11px]">
-                  {mlflow?.registered_model_name || 'text-summarization-model'}
+                  {mlflow?.registered_model_name || 'text-summarization-model'} {mlflow?.registered_model_version ? `(v${mlflow.registered_model_version})` : ''}
                 </span>
+              </div>
+              <div className="flex items-center justify-between text-xs mt-1">
+                <span className="text-slate-400">Recorded Traces</span>
+                <a
+                  href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-300 hover:text-purple-200 underline font-mono text-[11px] flex items-center gap-1"
+                >
+                  <span>{mlflow?.traces_count ?? 0} spans & pipeline traces</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
               </div>
             </div>
 

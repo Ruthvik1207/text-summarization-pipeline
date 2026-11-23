@@ -1,5 +1,13 @@
 import time
+import sys
+from pathlib import Path
 from typing import Dict, List, Any
+
+# Ensure backend root is on sys.path when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from app.utils.logger import logger
 
 def compute_rouge_scores(predictions: List[str], references: List[str]) -> Dict[str, float]:

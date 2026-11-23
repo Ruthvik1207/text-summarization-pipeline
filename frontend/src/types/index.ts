@@ -7,6 +7,19 @@ export interface SummarizeRequest {
   num_beams?: number;
 }
 
+export interface MessageDetectionInfo {
+  detected_type: 'emoji_only' | 'short_chat' | 'medium_message' | 'large_document' | 'massive_text';
+  type_label: string;
+  is_emoji_only: boolean;
+  has_emojis: boolean;
+  emoji_count: number;
+  emojis: string[];
+  emoji_meanings: string[];
+  tone?: string;
+  is_question: boolean;
+  reading_time_sec: number;
+}
+
 export interface SummarizeResponse {
   summary: string;
   model_name: string;
@@ -19,6 +32,8 @@ export interface SummarizeResponse {
   timestamp: string;
   request_id?: string;
   title?: string;
+  detection?: MessageDetectionInfo;
+  processing_mode?: string;
 }
 
 export interface FeedbackRequest {
@@ -80,6 +95,9 @@ export interface MLflowStatusResponse {
   registered_model_name: string;
   registered_model_version?: string | null;
   runs_count: number;
+  traces_count?: number;
+  latest_trace_id?: string | null;
+  traces_url?: string | null;
 }
 
 export interface MonitoringResponse {
@@ -175,6 +193,7 @@ export interface BatchItemResult {
   rougeL?: number | null;
   status: 'success' | 'failed' | 'skipped';
   error?: string | null;
+  detection?: MessageDetectionInfo;
 }
 
 export interface BatchSummarizeResponse {

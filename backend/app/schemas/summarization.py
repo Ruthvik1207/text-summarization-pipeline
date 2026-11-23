@@ -2,23 +2,34 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel, Field, model_validator
 
+class MessageDetectionInfo(BaseModel):
+    detected_type: str = Field(..., description="Category: emoji_only, short_chat, medium_message, large_document, massive_text")
+    type_label: str = Field(..., description="Human-friendly category label")
+    is_emoji_only: bool = False
+    has_emojis: bool = False
+    emoji_count: int = 0
+    emojis: List[str] = []
+    emoji_meanings: List[str] = []
+    tone: Optional[str] = None
+    is_question: bool = False
+    reading_time_sec: float = 0.0
+
 class SummarizeRequest(BaseModel):
-    text: str = Field(..., description="The document, article, or text to summarize")
+    text: str = Field(..., description="The document, article, chat message, or emojis to summarize")
     title: Optional[str] = Field(None, description="Optional document title")
-    max_length: Optional[int] = Field(150, ge=20, le=512, description="Maximum output summary tokens")
-    min_length: Optional[int] = Field(40, ge=10, le=400, description="Minimum output summary tokens")
+    max_length: Optional[int] = Field(150, ge=10, le=512, description="Maximum output summary tokens")
+    min_length: Optional[int] = Field(None, ge=1, le=400, description="Minimum output summary tokens (auto-adapted if omitted)")
     temperature: Optional[float] = Field(0.7, ge=0.0, le=2.0, description="Generation temperature")
-    num_beams: Optional[int] = Field(2, ge=1, le=8, description="Number of beams for beam search")
+    num_beams: Optional[int] = Field(1, ge=1, le=8, description="Number of beams for beam search (1 is fastest)")
 
     @model_validator(mode="after")
     def validate_lengths(self) -> 'SummarizeRequest':
         cleaned = self.text.strip()
         if not cleaned:
             raise ValueError("Input text cannot be empty or only whitespace")
-        if len(cleaned) < 25:
-            raise ValueError("Input text is too short to summarize (minimum 25 characters required)")
-        if len(cleaned) > 30000:
-            raise ValueError("Input text exceeds the maximum allowed length of 30,000 characters")
+        # Accept any non-empty input: small, emojis, big, large, massive (up to 200k chars)
+        if len(cleaned) > 200000:
+            raise ValueError("Input text exceeds the maximum allowed length of 200,000 characters")
         if self.min_length is not None and self.max_length is not None:
             if self.min_length > self.max_length:
                 raise ValueError(f"min_length ({self.min_length}) cannot be greater than max_length ({self.max_length})")
@@ -36,6 +47,8 @@ class SummarizeResponse(BaseModel):
     timestamp: str
     request_id: Optional[str] = None
     title: Optional[str] = None
+    detection: Optional[MessageDetectionInfo] = None
+    processing_mode: Optional[str] = None
 
 class FeedbackRequest(BaseModel):
     summary_id: Optional[str] = Field(None, description="ID of the summary being reviewed")
@@ -117,6 +130,9 @@ class MLflowStatusResponse(BaseModel):
     registered_model_name: str
     registered_model_version: Optional[str] = None
     runs_count: int = 0
+    traces_count: int = 0
+    latest_trace_id: Optional[str] = None
+    traces_url: Optional[str] = None
 
 class MonitoringResponse(BaseModel):
     total_predictions: int
@@ -148,10 +164,10 @@ class BatchSummarizeItem(BaseModel):
 
 class BatchSummarizeRequest(BaseModel):
     items: List[BatchSummarizeItem] = Field(..., max_length=100)
-    max_length: Optional[int] = Field(150, ge=20, le=512)
-    min_length: Optional[int] = Field(40, ge=10, le=400)
+    max_length: Optional[int] = Field(150, ge=10, le=512)
+    min_length: Optional[int] = Field(None, ge=1, le=400)
     temperature: Optional[float] = Field(0.7, ge=0.0, le=2.0)
-    num_beams: Optional[int] = Field(2, ge=1, le=8)
+    num_beams: Optional[int] = Field(1, ge=1, le=8)
 
 class BatchItemResult(BaseModel):
     id: Optional[str] = None
@@ -168,6 +184,7 @@ class BatchItemResult(BaseModel):
     rougeL: Optional[float] = None
     status: str = "success"
     error: Optional[str] = None
+    detection: Optional[MessageDetectionInfo] = None
 
 class BatchSummarizeResponse(BaseModel):
     total_processed: int

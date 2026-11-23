@@ -52,6 +52,8 @@ backend/data/*.db
 mlruns/
 mlflow.db
 .mlflow/
+mlflow-artifacts/
+backend/mlflow-artifacts/
 
 # DVC
 .dvc/cache/

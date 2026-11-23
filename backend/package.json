@@ -5,6 +5,7 @@
   "description": "FastAPI backend runner",
   "scripts": {
     "start": "py -3.14 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "mlflow": "py -3.14 -m mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlflow-artifacts --host 127.0.0.1 --port 5000",
     "test": "py -3.14 -m pytest tests/ -v"
   }
 }

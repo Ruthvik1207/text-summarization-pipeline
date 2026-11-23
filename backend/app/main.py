@@ -1,4 +1,12 @@
+import sys
+from pathlib import Path
 from contextlib import asynccontextmanager
+
+# Ensure backend root is on sys.path when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,9 +50,11 @@ async def lifespan(app: FastAPI):
     finally:
         db.close()
 
-    # Model pre-warming (in background thread so startup isn't blocked)
+    # MLflow server auto-start & Model pre-warming (in background thread so startup isn't blocked)
     import threading
-    def warm_model():
+    from app.services.mlflow_service import mlflow_service
+
+    def warm_model_and_services():
         try:
             logger.info("Pre-warming model singleton in background...")
             model_manager.load_model()
@@ -52,10 +62,19 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Background model pre-warming warning: {e}")
 
-    threading.Thread(target=warm_model, daemon=True).start()
+        try:
+            mlflow_service.start_local_server()
+        except Exception as e:
+            logger.warning(f"MLflow server startup notice: {e}")
+
+    threading.Thread(target=warm_model_and_services, daemon=True).start()
 
     yield
     logger.info("Shutting down Text Summarization Pipeline application...")
+    try:
+        mlflow_service.stop_local_server()
+    except Exception:
+        pass
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -111,3 +130,9 @@ def root():
         "api_docs": "/docs",
         "api_v1": settings.API_V1_STR
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+

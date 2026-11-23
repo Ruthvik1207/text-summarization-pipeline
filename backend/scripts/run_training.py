@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import yaml
 from pathlib import Path
 
@@ -16,7 +17,7 @@ def main():
         params = yaml.safe_load(f)["training"]
 
     print("Running DVC training stage with parameters:", params)
-    job_id = f"dvc-run-{int(sys.modules['time'].time())}"
+    job_id = f"dvc-run-{int(time.time())}"
 
     report = run_training_pipeline(
         job_id=job_id,

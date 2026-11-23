@@ -6,6 +6,13 @@ import pandas as pd
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Callable, Optional
+import sys
+
+# Ensure backend root is in sys.path when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
@@ -238,3 +245,27 @@ def run_training_pipeline(
     })
 
     return report_data
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Run Summarization Model Training Pipeline")
+    parser.add_argument("--epochs", type=int, default=2, help="Number of training epochs")
+    parser.add_argument("--batch-size", type=int, default=4, help="Batch size")
+    parser.add_argument("--learning-rate", type=float, default=5e-5, help="Learning rate")
+    parser.add_argument("--model-name", type=str, default="google/flan-t5-small", help="Model name")
+    parser.add_argument("--threshold", type=float, default=0.35, help="Minimum ROUGE-L threshold")
+    args = parser.parse_args()
+
+    job_id = f"cli-run-{int(time.time())}"
+    print(f"Starting training run: {job_id}")
+    report = run_training_pipeline(
+        job_id=job_id,
+        model_name=args.model_name,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        learning_rate=args.learning_rate,
+        min_rouge_threshold=args.threshold
+    )
+    print("\nTraining completed successfully:")
+    print(json.dumps(report, indent=2))

@@ -205,11 +205,14 @@ pip install -r requirements.txt
 # Run database setup and prepare dataset splits
 python scripts/prepare_data.py
 
-# Launch FastAPI development server
+# Launch FastAPI development server (auto-starts local MLflow tracking server)
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+# Or with npm runner: npm start
+# To run MLflow server standalone: npm run mlflow
 ```
 
 Backend will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+MLflow Tracking UI will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 #### 2. Frontend Setup
 

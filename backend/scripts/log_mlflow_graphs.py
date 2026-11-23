@@ -101,9 +101,9 @@ for r_info in runs_data:
         ax1.set_ylabel('Cross-Entropy Loss', color='#94a3b8', fontsize=10)
         ax1.tick_params(colors='#94a3b8', labelsize=9)
         for spine in ax1.spines.values():
-            spine.set_color('rgba(255,255,255,0.15)')
+            spine.set_color((1.0, 1.0, 1.0, 0.15))
         ax1.grid(True, linestyle=':', alpha=0.25, color='#94a3b8')
-        ax1.legend(facecolor='#1e293b', edgecolor='rgba(255,255,255,0.15)', labelcolor='#f8fafc', fontsize=10)
+        ax1.legend(facecolor='#1e293b', edgecolor=(1.0, 1.0, 1.0, 0.15), labelcolor='#f8fafc', fontsize=10)
         plt.tight_layout()
         mlflow.log_figure(fig1, 'plots/loss_convergence_curve.png')
         plt.close(fig1)
@@ -121,9 +121,9 @@ for r_info in runs_data:
         ax2.set_ylabel('ROUGE F1 Score', color='#94a3b8', fontsize=10)
         ax2.tick_params(colors='#94a3b8', labelsize=9)
         for spine in ax2.spines.values():
-            spine.set_color('rgba(255,255,255,0.15)')
+            spine.set_color((1.0, 1.0, 1.0, 0.15))
         ax2.grid(True, linestyle=':', alpha=0.25, color='#94a3b8')
-        ax2.legend(facecolor='#1e293b', edgecolor='rgba(255,255,255,0.15)', labelcolor='#f8fafc', fontsize=10)
+        ax2.legend(facecolor='#1e293b', edgecolor=(1.0, 1.0, 1.0, 0.15), labelcolor='#f8fafc', fontsize=10)
         plt.tight_layout()
         mlflow.log_figure(fig2, 'plots/rouge_evaluation_progression.png')
         plt.close(fig2)

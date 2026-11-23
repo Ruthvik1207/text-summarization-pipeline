@@ -38,9 +38,9 @@ export const BatchCsvPage: React.FC = () => {
 
   // Generation Configuration
   const [maxLength, setMaxLength] = useState<number>(150);
-  const [minLength, setMinLength] = useState<number>(40);
+  const [minLength, setMinLength] = useState<number>(15);
   const [temperature, setTemperature] = useState<number>(0.7);
-  const [numBeams, setNumBeams] = useState<number>(2);
+  const [numBeams, setNumBeams] = useState<number>(1);
   const [showConfig, setShowConfig] = useState<boolean>(false);
 
   // Execution States

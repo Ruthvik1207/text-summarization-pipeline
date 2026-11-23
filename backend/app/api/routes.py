@@ -59,9 +59,9 @@ def summarize_text(payload: SummarizeRequest, db: Session = Depends(get_db)):
             text=payload.text,
             title=payload.title,
             max_length=payload.max_length or settings.DEFAULT_MAX_OUTPUT_LENGTH,
-            min_length=payload.min_length or settings.DEFAULT_MIN_OUTPUT_LENGTH,
+            min_length=payload.min_length,
             temperature=payload.temperature if payload.temperature is not None else 0.7,
-            num_beams=payload.num_beams or 2,
+            num_beams=payload.num_beams if payload.num_beams is not None else 1,
             db=db
         )
         return SummarizeResponse(**result)
@@ -106,9 +106,9 @@ def summarize_batch(payload: BatchSummarizeRequest, db: Session = Depends(get_db
                 text=cleaned_text,
                 title=item.title,
                 max_length=payload.max_length or settings.DEFAULT_MAX_OUTPUT_LENGTH,
-                min_length=payload.min_length or settings.DEFAULT_MIN_OUTPUT_LENGTH,
+                min_length=payload.min_length,
                 temperature=payload.temperature if payload.temperature is not None else 0.7,
-                num_beams=payload.num_beams or 2,
+                num_beams=payload.num_beams if payload.num_beams is not None else 1,
                 db=db
             )
             total_time += res["processing_time_ms"]
@@ -136,7 +136,8 @@ def summarize_batch(payload: BatchSummarizeRequest, db: Session = Depends(get_db
                 rouge1=r1,
                 rouge2=r2,
                 rougeL=rL,
-                status="success"
+                status="success",
+                detection=res.get("detection")
             ))
         except Exception as e:
             logger.error(f"Error in batch item {item.id}: {e}")

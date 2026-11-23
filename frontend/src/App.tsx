@@ -80,15 +80,41 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchBackendData();
-    fetchAnalytics();
+    let isSubscribed = true;
+
+    const loadInitialData = async () => {
+      try {
+        const [h, m, d, ml, mon, met] = await Promise.allSettled([
+          api.getHealth(),
+          api.getModelInfo(),
+          api.getDatasetInfo(),
+          api.getMLflowStatus(),
+          api.getMonitoring(),
+          api.getMetrics()
+        ]);
+        if (!isSubscribed) return;
+        if (h.status === 'fulfilled') setHealth(h.value);
+        if (m.status === 'fulfilled') setModelInfo(m.value);
+        if (d.status === 'fulfilled') setDataset(d.value);
+        if (ml.status === 'fulfilled') setMLflow(ml.value);
+        if (mon.status === 'fulfilled') setMonitoring(mon.value);
+        if (met.status === 'fulfilled') setMetrics(met.value);
+      } catch {
+        // ignore
+      }
+    };
+
+    void loadInitialData();
 
     // Periodic heartbeat every 10 seconds
     const interval = setInterval(() => {
       fetchBackendData();
     }, 10000);
 
-    return () => clearInterval(interval);
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -102,6 +128,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isBackendHealthy={health?.status === 'healthy'}
+        mlflow={mlflow}
       />
 
       {/* Main Content Area */}

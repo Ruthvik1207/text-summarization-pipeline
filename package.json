@@ -1,0 +1,13 @@
+{
+  "name": "text-summarization-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production NLP Text Summarization Pipeline with FLAN-T5, FastAPI, MLflow, and React",
+  "scripts": {
+    "start:backend": "npm --prefix backend start",
+    "start:frontend": "npm --prefix frontend start",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix backend test",
+    "lint": "npm --prefix frontend run lint"
+  }
+}

@@ -1,5 +1,13 @@
 import re
+import sys
+from pathlib import Path
 from typing import List
+
+# Ensure backend root is on sys.path when executed directly
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from app.config import settings
 
 def clean_text(text: str) -> str:
