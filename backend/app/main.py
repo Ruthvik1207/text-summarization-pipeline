@@ -120,16 +120,37 @@ async def generic_exception_handler(request: Request, exc: Exception):
 # Include API router
 app.include_router(router)
 
-@app.get("/", tags=["Root"])
-def root():
-    return {
-        "project": settings.PROJECT_NAME,
-        "branding": settings.APP_BRANDING,
-        "version": settings.APP_VERSION,
-        "status": "online",
-        "api_docs": "/docs",
-        "api_v1": settings.API_V1_STR
-    }
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Serve compiled frontend React application when available
+_frontend_dist = _BACKEND_DIR.parent / "frontend" / "dist"
+if not _frontend_dist.exists():
+    _frontend_dist = _BACKEND_DIR / "dist"
+
+if _frontend_dist.exists() and (_frontend_dist / "index.html").exists():
+    if (_frontend_dist / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(_frontend_dist / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", tags=["Frontend"])
+    async def serve_frontend(full_path: str):
+        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path.startswith("openapi.json"):
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+        target_file = _frontend_dist / full_path
+        if full_path and target_file.exists() and target_file.is_file():
+            return FileResponse(str(target_file))
+        return FileResponse(str(_frontend_dist / "index.html"))
+else:
+    @app.get("/", tags=["Root"])
+    def root():
+        return {
+            "project": settings.PROJECT_NAME,
+            "branding": settings.APP_BRANDING,
+            "version": settings.APP_VERSION,
+            "status": "online",
+            "api_docs": "/docs",
+            "api_v1": settings.API_V1_STR
+        }
 
 
 if __name__ == "__main__":

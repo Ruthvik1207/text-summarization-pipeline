@@ -16,7 +16,10 @@ import {
   BatchSummarizeResponse
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (typeof window !== 'undefined' && window.location.port === '5173'
+    ? 'http://localhost:8000/api/v1'
+    : '/api/v1');
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
