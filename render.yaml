@@ -16,5 +16,7 @@ services:
         value: google/flan-t5-small
       - key: MLFLOW_TRACKING_URI
         value: http://127.0.0.1:5000
+      - key: MLFLOW_PUBLIC_URL
+        value: /mlflow/
       - key: CORS_ORIGINS
         value: '["*"]'

@@ -73,7 +73,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 FastAPI Base URL
               </span>
               <span className="text-cyan-400 font-mono">
-                {import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}
+                {import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api/v1` : '/api/v1')}
               </span>
             </div>
             <div className="py-2.5 flex items-center justify-between">
@@ -103,7 +103,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 MLflow Tracking URI
               </span>
               <span className="text-slate-200 font-mono">
-                {mlflow?.tracking_uri || 'http://localhost:5000'}
+                {mlflow?.tracking_uri || '/mlflow/'}
               </span>
             </div>
             <div className="py-2.5 flex items-center justify-between">

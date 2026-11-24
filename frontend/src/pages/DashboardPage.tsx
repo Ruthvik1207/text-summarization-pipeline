@@ -136,7 +136,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             {mlflow?.experiment_name || 'text-summarization'}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
-            Tracking at {mlflow?.tracking_uri || 'http://localhost:5000'}
+            Tracking at {mlflow?.tracking_uri || '/mlflow/'}
           </p>
         </GlassCard>
 

@@ -229,7 +229,7 @@ export const ApiDocsPage: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <a
-            href="http://localhost:8000/docs"
+            href="/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium text-slate-200 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-colors shadow-glow-cyan"
@@ -238,7 +238,7 @@ export const ApiDocsPage: React.FC = () => {
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
           <a
-            href="http://localhost:8000/redoc"
+            href="/redoc"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition-colors"

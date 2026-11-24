@@ -179,7 +179,7 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
                 variant={mlflow?.is_connected ? 'healthy' : 'warning'}
               />
               <a
-                href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
+                href={mlflow?.traces_url || '/mlflow/#/experiments/1/traces'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-purple-300 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 transition-colors"
@@ -192,7 +192,7 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
                 <ExternalLink className="w-3 h-3" />
               </a>
               <a
-                href={mlflow?.tracking_uri || 'http://localhost:5000'}
+                href={mlflow?.tracking_uri || '/mlflow/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-colors"
@@ -208,7 +208,7 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Tracking URI</span>
                 <span className="text-cyan-400 font-mono text-[11px]">
-                  {mlflow?.tracking_uri || 'http://localhost:5000'}
+                  {mlflow?.tracking_uri || '/mlflow/'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs mt-1">
@@ -226,7 +226,7 @@ export const MLOpsPage: React.FC<MLOpsPageProps> = ({ dataset, mlflow, onRefresh
               <div className="flex items-center justify-between text-xs mt-1">
                 <span className="text-slate-400">Recorded Traces</span>
                 <a
-                  href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
+                  href={mlflow?.traces_url || '/mlflow/#/experiments/1/traces'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-purple-300 hover:text-purple-200 underline font-mono text-[11px] flex items-center gap-1"

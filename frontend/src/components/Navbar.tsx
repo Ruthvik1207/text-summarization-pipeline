@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             pulse={isBackendHealthy}
           />
           <a
-            href={mlflow?.traces_url || 'http://localhost:5000/#/experiments/1/traces'}
+            href={mlflow?.traces_url || '/mlflow/#/experiments/1/traces'}
             target="_blank"
             rel="noopener noreferrer"
             className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
@@ -122,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
           </a>
           <a
-            href={mlflow?.tracking_uri || 'http://localhost:5000'}
+            href={mlflow?.tracking_uri || '/mlflow/'}
             target="_blank"
             rel="noopener noreferrer"
             className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
@@ -137,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </a>
           <a
-            href="http://localhost:8000/docs"
+            href="/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-colors"
