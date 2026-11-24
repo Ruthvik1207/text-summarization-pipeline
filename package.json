@@ -4,6 +4,7 @@
   "private": true,
   "description": "Production NLP Text Summarization Pipeline with FLAN-T5, FastAPI, MLflow, and React",
   "scripts": {
+    "start": "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}",
     "start:backend": "npm --prefix backend start",
     "start:frontend": "npm --prefix frontend start",
     "build": "npm --prefix frontend run build",
