@@ -132,7 +132,7 @@ async def _forward_to_mlflow(request: Request, path: str = ""):
     if request.url.query:
         url = f"{url}?{request.url.query}"
     
-    client = httpx.AsyncClient(timeout=60.0)
+    client = httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=3.0))
     try:
         content = await request.body()
         headers = dict(request.headers)
