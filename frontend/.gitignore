@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+# dist (tracked so Render fullstack single-service deployment includes compiled UI)
 dist-ssr
 *.local
 
