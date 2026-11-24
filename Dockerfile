@@ -3,7 +3,11 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PORT=8000
+    PORT=7860 \
+    PYTHONPATH=/app:/app/backend
+
+# Create non-root user with UID 1000 required by Hugging Face Spaces
+RUN useradd -m -u 1000 user
 
 WORKDIR /app
 
@@ -15,21 +19,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies (CPU-optimized for cloud deployment)
-COPY backend/requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install torch --index-url https://download.pytorch.org/whl/cpu && \
-    pip install -r requirements.txt
+COPY --chown=user:user requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application
-COPY backend/ .
+# Copy all application files (including root main.py and prebuilt frontend/dist & backend/dist)
+COPY --chown=user:user . .
 
-# Ensure runtime directories exist
-RUN mkdir -p data/raw data/processed data/reference models artifacts reports
+# Ensure runtime directories exist with write permissions for user 1000
+RUN mkdir -p backend/data backend/reports backend/artifacts backend/mlflow-artifacts backend/models && \
+    chown -R user:user /app
 
-EXPOSE 8000
+USER user
+
+EXPOSE 7860
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+    CMD curl -f http://localhost:7860/api/v1/health || exit 1
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
-
+CMD ["python", "main.py"]

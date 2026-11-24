@@ -1,3 +1,14 @@
+---
+title: Text Summarization Pipeline
+emoji: ⚡
+colorFrom: cyan
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # Text Summarization Pipeline
 
 > **Text Summarization Pipeline — Intelligent NLP & Continuous MLOps Platform**  
