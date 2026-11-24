@@ -15,6 +15,8 @@ license: mit
 > *Production-grade NLP summarization powered by Google FLAN-T5, FastAPI, MLflow experiment tracking, DVC dataset versioning, Evidently AI drift monitoring, Docker Compose, and a Liquid Glass React dashboard.*
 
 [![CI/CD Pipeline](https://github.com/Ruthvik1207/text-summarization-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Ruthvik1207/text-summarization-pipeline/actions)
+[![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model%20Hub-orange.svg)](https://huggingface.co/RUTHVIK82/text-summarization-pipeline)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20UI-blue.svg)](https://huggingface.co/spaces/RUTHVIK82/text-summarization-ui)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
 [![React 19](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://react.dev/)
@@ -381,6 +383,33 @@ git push -u origin main
 
 ---
 
-## 13. License
+## 13. Hugging Face Deployment & Live Inference
+
+The model and frontend are also deployed on **Hugging Face**:
+
+- **Model Hub Repository**: [https://huggingface.co/RUTHVIK82/text-summarization-pipeline](https://huggingface.co/RUTHVIK82/text-summarization-pipeline)
+  - Features full model weights (`model.safetensors`), tokenizer configurations, model cards, and an interactive **live inference widget** directly in your browser.
+- **Spaces Web Dashboard**: [https://huggingface.co/spaces/RUTHVIK82/text-summarization-ui](https://huggingface.co/spaces/RUTHVIK82/text-summarization-ui)
+  - Hosted static distribution of the Liquid Glass React UI.
+
+### Python Quickstart from Hugging Face
+
+```python
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+
+repo_id = "RUTHVIK82/text-summarization-pipeline"
+tokenizer = AutoTokenizer.from_pretrained(repo_id)
+model = AutoModelForSeq2SeqLM.from_pretrained(repo_id)
+
+text = "Summarize: Natural Language Processing has advanced significantly with transformer architectures like FLAN-T5, enabling high-quality zero-shot and few-shot abstractive summaries across diverse long-form documents."
+inputs = tokenizer(text, return_tensors="pt", max_length=512, truncation=True)
+summary_ids = model.generate(inputs["input_ids"], max_length=150, min_length=20, num_beams=2)
+
+print("Generated Summary:", tokenizer.decode(summary_ids[0], skip_special_tokens=True))
+```
+
+---
+
+## 14. License
 
 Distributed under the MIT License. See `LICENSE` for more information.
