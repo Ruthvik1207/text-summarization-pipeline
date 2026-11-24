@@ -62,6 +62,14 @@ class ModelManager:
                     raise RuntimeError(f"Failed to load tokenizer or model from {source}")
                 
                 self.model.to(self.device)
+                if self.device.type == "cpu":
+                    try:
+                        self.model = torch.quantization.quantize_dynamic(
+                            self.model, {torch.nn.Linear}, dtype=torch.qint8
+                        )
+                        logger.info("Dynamic int8 CPU quantization applied (RAM compressed to ~62MB).")
+                    except Exception as q_err:
+                        logger.debug(f"Quantization notice: {q_err}")
                 self.model.eval()
                 self.is_loaded = True
                 self.load_error = None
