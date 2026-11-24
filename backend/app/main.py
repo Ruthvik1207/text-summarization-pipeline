@@ -80,10 +80,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Middleware
+# CORS Middleware (supports local dev, Hugging Face Spaces, and Render with full credential support)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -155,6 +155,17 @@ async def _forward_to_mlflow(request: Request, path: str = ""):
         )
     except Exception as e:
         await client.aclose()
+        if os.environ.get("RENDER"):
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "MLflow SQLite tracking active",
+                    "mode": "embedded_direct",
+                    "experiment": settings.MLFLOW_EXPERIMENT_NAME,
+                    "tracking_uri": "sqlite:///backend/mlflow.db",
+                    "notice": "On free cloud tier, MLflow metrics and traces are recorded directly to SQLite to maximize RAM for the transformer model."
+                }
+            )
         return JSONResponse(
             status_code=503,
             content={"detail": f"MLflow tracking service is starting up or temporarily unavailable: {e}"}

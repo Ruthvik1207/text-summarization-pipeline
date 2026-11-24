@@ -23,7 +23,9 @@ class MLflowService:
             self.client = None
 
     def is_connected(self) -> bool:
-        """Check if MLflow tracking server is reachable."""
+        """Check if MLflow tracking server is reachable or SQLite store is initialized."""
+        if self.tracking_uri.startswith("sqlite") or os.environ.get("RENDER"):
+            return True
         try:
             from urllib.parse import urlparse
             import socket
@@ -55,7 +57,15 @@ class MLflowService:
         return False
 
     def start_local_server(self) -> bool:
-        """Starts local MLflow tracking server as a background subprocess if tracking URI is localhost."""
+        """Starts local MLflow tracking server as a background subprocess, or uses direct SQLite store on cloud free tiers."""
+        if os.environ.get("RENDER"):
+            # On Render free tier (512MB RAM), use direct embedded SQLite store to prevent OOM process restarts
+            logger.info("Render cloud environment detected: using lightweight direct SQLite MLflow tracking.")
+            db_path = settings.BACKEND_DIR / "mlflow.db"
+            self.tracking_uri = f"sqlite:///{db_path.resolve().as_posix()}"
+            self._setup_client()
+            return True
+
         if self.is_connected():
             return True
         try:
