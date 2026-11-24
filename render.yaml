@@ -21,3 +21,5 @@ services:
         value: /mlflow/
       - key: CORS_ORIGINS
         value: '["*"]'
+      - key: PYTHONPATH
+        value: .:backend

@@ -1,10 +1,16 @@
 import os
+import sys
 import json
 import pandas as pd
 import numpy as np
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from app.config import settings
 from app.utils.logger import logger
 
