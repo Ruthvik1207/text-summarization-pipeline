@@ -1,17 +1,15 @@
 services:
-  # Option 1: Unified Full-Stack Web Service (Serves both React UI and FastAPI REST backend from a single Render Free instance)
+  # Unified Full-Stack Web Service (Serves both Liquid Glass React UI & FastAPI REST API from 1 Render instance)
   - type: web
-    name: text-summarization-app
+    name: text-summarization-pipeline
     runtime: python
     plan: free
-    buildCommand: npm --prefix frontend install && npm --prefix frontend run build && pip install --upgrade pip && pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
-    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: NODE_VERSION
-        value: 20.18.0
       - key: DEVICE
         value: cpu
       - key: MODEL_NAME
@@ -20,15 +18,3 @@ services:
         value: http://127.0.0.1:5000
       - key: CORS_ORIGINS
         value: '["*"]'
-
-  # Option 2: Standalone Static Site for Frontend (Optional if you prefer separate frontend and backend hosting)
-  - type: static
-    name: text-summarization-frontend
-    rootDir: frontend
-    plan: free
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
