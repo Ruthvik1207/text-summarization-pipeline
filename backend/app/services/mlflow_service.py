@@ -76,6 +76,7 @@ class MLflowService:
                     "--default-artifact-root", str(artifacts_path.resolve().as_posix()),
                     "--host", "127.0.0.1",
                     "--port", str(port),
+                    "--workers", "1",
                     "--cors-allowed-origins", "*",
                     "--allowed-hosts", "*"
                 ]

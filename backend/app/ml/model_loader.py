@@ -53,7 +53,10 @@ class ModelManager:
                 
                 logger.info(f"Loading weights from: {source}")
                 self.tokenizer = AutoTokenizer.from_pretrained(source)
-                self.model = AutoModelForSeq2SeqLM.from_pretrained(source)
+                try:
+                    self.model = AutoModelForSeq2SeqLM.from_pretrained(source, low_cpu_mem_usage=True)
+                except Exception:
+                    self.model = AutoModelForSeq2SeqLM.from_pretrained(source)
                 
                 if self.model is None or self.tokenizer is None:
                     raise RuntimeError(f"Failed to load tokenizer or model from {source}")

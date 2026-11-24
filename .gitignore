@@ -54,6 +54,7 @@ backend/data/*.db
 mlruns/
 mlflow.db
 .mlflow/
+mlartifacts/
 mlflow-artifacts/
 backend/mlflow-artifacts/
 

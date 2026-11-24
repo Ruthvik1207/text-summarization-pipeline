@@ -16,10 +16,23 @@ import {
   BatchSummarizeResponse
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (typeof window !== 'undefined' && window.location.port === '5173'
-    ? 'http://localhost:8000/api/v1'
-    : '/api/v1');
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.port === '5173') {
+      return 'http://localhost:8000/api/v1';
+    }
+    // When running inside Hugging Face Spaces static frame, connect to cloud backend
+    if (window.location.hostname.includes('hf.space') || window.location.hostname.includes('huggingface.co')) {
+      return 'https://text-summarization-pipeline-hmjz.onrender.com/api/v1';
+    }
+  }
+  return '/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {

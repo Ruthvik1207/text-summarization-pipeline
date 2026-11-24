@@ -56,16 +56,17 @@ async def lifespan(app: FastAPI):
 
     def warm_model_and_services():
         try:
+            logger.info("Auto-starting embedded MLflow tracking server...")
+            mlflow_service.start_local_server()
+        except Exception as e:
+            logger.warning(f"MLflow server startup notice: {e}")
+
+        try:
             logger.info("Pre-warming model singleton in background...")
             model_manager.load_model()
             logger.info("Model singleton ready for inference.")
         except Exception as e:
             logger.warning(f"Background model pre-warming warning: {e}")
-
-        try:
-            mlflow_service.start_local_server()
-        except Exception as e:
-            logger.warning(f"MLflow server startup notice: {e}")
 
     threading.Thread(target=warm_model_and_services, daemon=True).start()
 

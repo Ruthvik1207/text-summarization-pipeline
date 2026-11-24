@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{BACKEND_DIR / 'data' / 'summarai.db'}"
     
     # MLOps: MLflow
-    MLFLOW_TRACKING_URI: str = "http://localhost:5000"
+    MLFLOW_TRACKING_URI: str = "http://127.0.0.1:5000"
     MLFLOW_EXPERIMENT_NAME: str = "text-summarization"
     MLFLOW_REGISTERED_MODEL_NAME: str = "text-summarization-model"
     
@@ -49,6 +49,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://localhost:8000",
+        "https://huggingface.co",
+        "https://*.hf.space",
         "*"
     ]
 
@@ -82,5 +84,6 @@ for path in [
     settings.MODELS_DIR,
     settings.ARTIFACTS_DIR,
     settings.REPORTS_DIR,
+    settings.BACKEND_DIR / "mlflow-artifacts",
 ]:
     path.mkdir(parents=True, exist_ok=True)
